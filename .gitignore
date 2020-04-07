@@ -1,0 +1,5 @@
+./Jasmin.iml
+./out
+./idea
+# Project exclude paths
+/out/
