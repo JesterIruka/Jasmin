@@ -1,5 +1,6 @@
 package br.com.jesteriruka.jasmin;
 
+import javax.swing.text.html.Option;
 import javax.xml.transform.Result;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -51,7 +52,19 @@ public class Jasmin {
     }
 
     public String getString(String column) {
-        return Optional.ofNullable(column).map(Object::toString).orElse(null);
+        return opt(column).map(Object::toString).orElse(null);
+    }
+
+    public UUID getUniqueId(String column) {
+        return opt(column).map(o->UUID.fromString(o.toString())).orElse(null);
+    }
+
+    public Date getDate(String column) {
+        return opt(column, Date.class).orElse(null);
+    }
+
+    private Optional<Object> opt(String key) {
+        return Optional.ofNullable(get(key));
     }
 
     private <T> Optional<T> opt(String key, Class<? extends T> clazz) {
@@ -70,6 +83,10 @@ public class Jasmin {
 
     public byte getByte(String column) {
         return getNumber(column).byteValue();
+    }
+
+    public byte[] getBase64(String column) {
+        return opt(column).map(o->Base64.getDecoder().decode(o.toString())).orElse(null);
     }
 
     public boolean getBoolean(String column) {

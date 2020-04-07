@@ -61,6 +61,10 @@ public class TableSelect extends QueryBuilder<TableSelect> {
         return select(column).get().stream().map(j->j.get(column)).collect(Collectors.toList());
     }
 
+    public List<Long> pluckId() throws SQLException {
+        return select("id").get().stream().map(Jasmin::id).collect(Collectors.toList());
+    }
+
     public List<String> pluckString(String column) throws SQLException {
         return select(column).get().stream().map(j->j.getString(column)).collect(Collectors.toList());
     }

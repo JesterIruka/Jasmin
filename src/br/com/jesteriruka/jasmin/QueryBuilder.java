@@ -2,6 +2,7 @@ package br.com.jesteriruka.jasmin;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class QueryBuilder<T extends QueryBuilder<T>> {
@@ -113,6 +114,7 @@ public class QueryBuilder<T extends QueryBuilder<T>> {
     }
 
     protected List<Object> getBindings() {
+        values.replaceAll(o -> o instanceof UUID ? o.toString() : o);
         return values;
     }
 }
