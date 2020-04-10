@@ -3,7 +3,6 @@ package br.com.jesteriruka.jasmin;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class TableUpdate extends QueryBuilder<TableUpdate> {
 
@@ -19,6 +18,10 @@ public class TableUpdate extends QueryBuilder<TableUpdate> {
     public TableUpdate set(Object... values) {
         this.values = values;
         return this;
+    }
+
+    public void run() throws SQLException {
+        make();
     }
 
     public void exec() throws SQLException {

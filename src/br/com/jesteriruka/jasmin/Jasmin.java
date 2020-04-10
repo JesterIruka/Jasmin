@@ -1,7 +1,5 @@
 package br.com.jesteriruka.jasmin;
 
-import javax.swing.text.html.Option;
-import javax.xml.transform.Result;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -44,7 +42,7 @@ public class Jasmin {
     }
 
     public Object get(String column) {
-        return columns.get(column);
+        return columns.get(column.toLowerCase());
     }
 
     public Number getNumber(String column) {
@@ -57,6 +55,16 @@ public class Jasmin {
 
     public UUID getUniqueId(String column) {
         return opt(column).map(o->UUID.fromString(o.toString())).orElse(null);
+    }
+
+    public <T extends Enum<T>> T getEnum(String column, Class<T> clazz) {
+        String raw = getString(column);
+        if (raw == null) return null;
+        try {
+            return Enum.valueOf(clazz, raw);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     public Date getDate(String column) {
@@ -75,6 +83,14 @@ public class Jasmin {
 
     public long getLong(String column) {
         return getNumber(column).longValue();
+    }
+
+    public double getDouble(String column) {
+        return getNumber(column).doubleValue();
+    }
+
+    public float getFloat(String column) {
+        return getNumber(column).floatValue();
     }
 
     public int getInt(String column) {

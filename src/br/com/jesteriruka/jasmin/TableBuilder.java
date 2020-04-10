@@ -1,7 +1,8 @@
 package br.com.jesteriruka.jasmin;
 
-import java.util.*;
-import java.util.stream.Stream;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class TableBuilder {
 
@@ -19,6 +20,10 @@ public class TableBuilder {
         return addColumn(column, "VARCHAR("+len+")");
     }
 
+    public TableColumn uuid(String column) {
+        return string(column, 36);
+    }
+
     public TableColumn bool(String column) {
         return tinyint(column);
     }
@@ -29,6 +34,14 @@ public class TableBuilder {
 
     public TableColumn integer(String column) {
         return addColumn(column, "INT");
+    }
+
+    public TableColumn decimal(String column) {
+        return addColumn(column, "DECIMAL(10,2)");
+    }
+
+    public TableColumn decimal(String column, int size, int precision) {
+        return addColumn(column, "DECIMAL("+size+","+precision+")");
     }
 
     public TableColumn bigint(String column) {

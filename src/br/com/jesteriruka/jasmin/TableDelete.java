@@ -2,7 +2,6 @@ package br.com.jesteriruka.jasmin;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.List;
 
 public class TableDelete extends QueryBuilder<TableDelete> {
 

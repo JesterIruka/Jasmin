@@ -3,11 +3,7 @@ package br.com.jesteriruka.jasmin;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -53,12 +49,37 @@ public class TableSelect extends QueryBuilder<TableSelect> {
         return limit(1).get().stream().findFirst().orElse(Jasmin.EMPTY);
     }
 
+    public Jasmin firstOrNull() throws SQLException {
+        return limit(1).get().stream().findFirst().orElse(null);
+    }
+
+    public Object first(String column) throws SQLException {
+        return select(columns).first().get(column);
+    }
+
+    public Number firstNumber(String column) throws SQLException {
+        return select(column).first().getNumber(column);
+    }
+
+    public UUID firstUniqueId(String column) throws SQLException {
+        return select(columns).first().getUniqueId(column);
+    }
+
     public <T> T first(Function<Jasmin, T> function) throws SQLException {
         return function.apply(first());
     }
 
+    public <T> T firstOrNull(Function<Jasmin, T> function) throws SQLException {
+        Jasmin j = firstOrNull();
+        return (j == null) ? null : function.apply(j);
+    }
+
     public List<Object> pluck(String column) throws SQLException {
         return select(column).get().stream().map(j->j.get(column)).collect(Collectors.toList());
+    }
+
+    public <T extends Enum<T>> List<T> pluckEnum(String column, Class<T> tClass) throws SQLException {
+        return select(column).get().stream().map(j->j.getEnum(column, tClass)).collect(Collectors.toList());
     }
 
     public List<Long> pluckId() throws SQLException {
@@ -73,6 +94,54 @@ public class TableSelect extends QueryBuilder<TableSelect> {
         return select(column).get().stream().map(j->j.getLong(column)).collect(Collectors.toList());
     }
 
+    public Map<UUID, String> pluckUUIDString(String key, String value) throws SQLException {
+        Map<UUID, String> map = new LinkedHashMap<>();
+        for (Jasmin jasmin : select(key, value).get()) {
+            map.put(jasmin.getUniqueId(key), jasmin.getString(value));
+        }
+        return map;
+    }
+
+    public Map<UUID, Long> pluckUUIDLong(String key, String value) throws SQLException {
+        Map<UUID, Long> map = new LinkedHashMap<>();
+        for (Jasmin jasmin : select(key, value).get()) {
+            map.put(jasmin.getUniqueId(key), jasmin.getLong(value));
+        }
+        return map;
+    }
+
+    public Map<String, String> pluckStringString(String key, String value) throws SQLException {
+        Map<String, String> map = new HashMap<>();
+        for (Jasmin jasmin : select(key, value).get()) {
+            map.put(jasmin.getString(key), jasmin.getString(value));
+        }
+        return map;
+    }
+
+    public Map<String, Long> pluckStringLong(String key, String value) throws SQLException {
+        Map<String, Long> map = new LinkedHashMap<>();
+        for (Jasmin jasmin : select(key, value).get()) {
+            map.put(jasmin.getString(key), jasmin.getLong(value));
+        }
+        return map;
+    }
+
+    public Map<Long, String> pluckLongString(String key, String value) throws SQLException {
+        Map<Long, String> map = new HashMap<>();
+        for (Jasmin jasmin : select(key, value).get()) {
+            map.put(jasmin.getLong(key), jasmin.getString(value));
+        }
+        return map;
+    }
+
+    public Map<Long, Long> pluckLongLong(String key, String value) throws SQLException {
+        Map<Long, Long> map = new LinkedHashMap<>();
+        for (Jasmin jasmin : select(key, value).get()) {
+            map.put(jasmin.getLong(key), jasmin.getLong(value));
+        }
+        return map;
+    }
+
     public List<Boolean> pluckBoolean(String column) throws SQLException {
         return select(column).get().stream().map(j->j.getBoolean(column)).collect(Collectors.toList());
     }
@@ -82,7 +151,7 @@ public class TableSelect extends QueryBuilder<TableSelect> {
     }
 
     public <K,V> Map<K, V> map(String key, String val, Class<? extends K> KEY, Class<? extends V> VAL) throws SQLException {
-        Map<K, V> map = new HashMap<>();
+        Map<K, V> map = new LinkedHashMap<>();
         List<Jasmin> list = select(key, val).get();
         list.forEach(j -> {
             map.put(j.get(key, KEY), j.get(val, VAL));
@@ -109,4 +178,7 @@ public class TableSelect extends QueryBuilder<TableSelect> {
         return get().stream().map(function).collect(Collectors.toList());
     }
 
+    public boolean exists() throws SQLException {
+        return select("COUNT(*) AS amount").firstNumber("amount").longValue() > 0;
+    }
 }

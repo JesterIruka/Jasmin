@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 public class Table {
 
@@ -47,8 +46,44 @@ public class Table {
         return new TableInsert(this, columns);
     }
 
+    public TableInsert replace(String... columns) {
+        return insert(columns).replace();
+    }
+
     public TableSelect select(String... columns) {
         return new TableSelect(this).select(columns);
+    }
+
+    public TableSelect where(String key, Object value) {
+        return select().where(key, value);
+    }
+
+    public TableSelect where(String key, String operator, Object value) {
+        return select().where(key, operator, value);
+    }
+
+    public TableSelect whereNull(String key) {
+        return select().whereNull(key);
+    }
+
+    public TableSelect whereNotNull(String key) {
+        return select().whereNotNull(key);
+    }
+
+    public TableSelect whereMin(String key, Number number) {
+        return select().whereMin(key, number);
+    }
+
+    public TableSelect whereMax(String key, Number number) {
+        return select().whereMax(key, number);
+    }
+
+    public TableSelect whereIn(String key, Object[] values) {
+        return select().whereIn(key, values);
+    }
+
+    public TableSelect whereNotIn(String key, Object[] values) {
+        return select().whereNotIn(key, values);
     }
 
     public TableUpdate update(String... columns) {
